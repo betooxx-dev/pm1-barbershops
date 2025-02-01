@@ -19,7 +19,10 @@ interface ApiService {
     suspend fun createBarbershop(@Body barbershop: Barbershop): Response<Barbershop>
 
     @PUT("barbershop/{id}")
-    suspend fun updateBarbershop(@Path("id") id: String, @Body barbershop: Barbershop): Response<Barbershop>
+    suspend fun updateBarbershop(
+        @Path("id") id: String,
+        @Body barbershop: Barbershop
+    ): Response<Barbershop>
 
     @DELETE("barbershop/{id}")
     suspend fun deleteBarbershop(@Path("id") id: String): Response<Unit>

@@ -32,7 +32,7 @@ class BarbershopRepository(private val apiService: ApiService) {
 
     suspend fun updateBarbershop(barbershop: Barbershop): Result<Barbershop> {
         return try {
-            val response = apiService.updateBarbershop(barbershop.id, barbershop)
+            val response = apiService.updateBarbershop(barbershop._id, barbershop)
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {

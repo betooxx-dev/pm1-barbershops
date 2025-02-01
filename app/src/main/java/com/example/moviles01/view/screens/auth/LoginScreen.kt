@@ -11,19 +11,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.moviles01.view.components.ErrorDialog
 import com.example.moviles01.view.components.LoadingSpinner
+import com.example.moviles01.viewmodel.auth.AuthViewModel
 
 @Composable
 fun LoginScreen(
+    viewModel: AuthViewModel,
     onNavigateToRegister: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var showError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    val authState by viewModel.authState.collectAsState()
 
-    if (isLoading) {
+    LaunchedEffect(authState.isAuthenticated) {
+        if (authState.isAuthenticated) {
+            onLoginSuccess()
+        }
+    }
+
+    if (authState.isLoading) {
         LoadingSpinner()
         return
     }
@@ -66,14 +72,11 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                // Esta lógica se moverá al ViewModel
                 if (email.isBlank() || password.isBlank()) {
-                    errorMessage = "Por favor complete todos los campos"
-                    showError = true
+                    viewModel.setError("Por favor complete todos los campos")
                     return@Button
                 }
-                isLoading = true
-                // Aquí se llamará al ViewModel
+                viewModel.login(email, password)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,18 +85,23 @@ fun LoginScreen(
             Text("Iniciar sesión")
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         TextButton(
-            onClick = onNavigateToRegister,
-            modifier = Modifier.padding(top = 16.dp)
+            onClick = onNavigateToRegister
         ) {
-            Text("¿No tienes cuenta? Regístrate")
+            Text(
+                text = "¿No tienes cuenta? Regístrate aquí",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 
-    if (showError) {
+    if (authState.error != null) {
         ErrorDialog(
-            errorMessage = errorMessage,
-            onDismiss = { showError = false }
+            errorMessage = authState.error!!,
+            onDismiss = { viewModel.clearError() }
         )
     }
 }

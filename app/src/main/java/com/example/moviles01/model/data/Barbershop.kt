@@ -25,7 +25,7 @@ data class Photo(
 )
 
 data class Barbershop(
-    val id: String = "",
+    val _id: String = "",
     val name: String,
     val description: String,
     val location: Location,
