@@ -1,5 +1,7 @@
 package com.example.moviles01.viewmodel.barbershop
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviles01.model.data.Barbershop
@@ -8,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class BarbershopViewModel(
     private val repository: BarbershopRepository
@@ -135,6 +138,16 @@ class BarbershopViewModel(
             isDeleteDialogVisible = false,
             barbershopToDelete = null
         )
+    }
+
+    fun uploadImage(uri: Uri, context: Context): Result<String> {
+        return runBlocking {
+            try {
+                repository.uploadImage(uri, context)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
     }
 
     fun selectBarbershop(barbershop: Barbershop?) {

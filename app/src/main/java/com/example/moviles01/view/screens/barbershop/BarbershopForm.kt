@@ -1,25 +1,31 @@
 package com.example.moviles01.view.screens.barbershop
 
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.moviles01.model.data.Barbershop
 import com.example.moviles01.model.data.Contact
 import com.example.moviles01.model.data.Location
 import com.example.moviles01.model.data.WorkingDays
 import com.example.moviles01.view.components.ErrorDialog
 import com.example.moviles01.view.components.LoadingSpinner
+import com.example.moviles01.view.screens.barbershop.components.ImagePicker
+import kotlinx.coroutines.launch
 
 @Composable
 fun BarbershopForm(
     barbershop: Barbershop? = null,
     isLoading: Boolean = false,
     onSubmit: (Barbershop) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onUploadImage: suspend (Uri) -> Result<String>
 ) {
     var name by remember { mutableStateOf(barbershop?.name ?: "") }
     var description by remember { mutableStateOf(barbershop?.description ?: "") }
@@ -31,10 +37,16 @@ fun BarbershopForm(
     var schedule by remember { mutableStateOf(barbershop?.workingDays?.schedule ?: "") }
     var logo by remember { mutableStateOf(barbershop?.logo ?: "") }
 
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var isImageUploading by remember { mutableStateOf(false) }
+
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    if (isLoading) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    if (isLoading || isImageUploading) {
         LoadingSpinner()
         return
     }
@@ -50,6 +62,52 @@ fun BarbershopForm(
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )
+
+        // Sección de imagen
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Logo",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                if (logo.isNotEmpty()) {
+                    AsyncImage(
+                        model = logo,
+                        contentDescription = "Logo preview",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(bottom = 8.dp)
+                    )
+                }
+
+                ImagePicker { uri ->
+                    selectedImageUri = uri
+                    scope.launch {
+                        isImageUploading = true
+                        onUploadImage(uri).fold(
+                            onSuccess = { url ->
+                                logo = url
+                                isImageUploading = false
+                            },
+                            onFailure = { exception ->
+                                errorMessage = exception.message ?: "Error al subir la imagen"
+                                showError = true
+                                isImageUploading = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
 
         // Información básica
         Card(
@@ -184,30 +242,6 @@ fun BarbershopForm(
             }
         }
 
-        // Logo URL
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Logo",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                OutlinedTextField(
-                    value = logo,
-                    onValueChange = { logo = it },
-                    label = { Text("URL del Logo") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
         // Botones de acción
         Row(
             modifier = Modifier
@@ -226,7 +260,8 @@ fun BarbershopForm(
                 onClick = {
                     if (name.isBlank() || description.isBlank() || city.isBlank() ||
                         street.isBlank() || phone.isBlank() || email.isBlank() ||
-                        days.isBlank() || schedule.isBlank() || logo.isBlank()) {
+                        days.isBlank() || schedule.isBlank() || logo.isBlank()
+                    ) {
                         errorMessage = "Por favor complete todos los campos"
                         showError = true
                         return@Button

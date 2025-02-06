@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import com.example.moviles01.view.screens.auth.LoginScreen
 import com.example.moviles01.view.screens.auth.RegisterScreen
 import com.example.moviles01.view.screens.barbershop.BarbershopScreen
@@ -13,6 +14,8 @@ import com.example.moviles01.view.screens.barbershop.BarbershopForm
 import com.example.moviles01.viewmodel.auth.AuthViewModel
 import com.example.moviles01.viewmodel.barbershop.BarbershopViewModel
 import com.example.moviles01.viewmodel.shared.SharedViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -91,6 +94,7 @@ fun MainNavigation(
         }
 
         composable(Screen.BarbershopForm.route) {
+            val context = LocalContext.current
             BarbershopForm(
                 barbershop = barbershopState.selectedBarbershop,
                 isLoading = barbershopState.isLoading,
@@ -105,6 +109,11 @@ fun MainNavigation(
                 onCancel = {
                     barbershopViewModel.selectBarbershop(null)
                     navController.navigateUp()
+                },
+                onUploadImage = { uri ->
+                    withContext(Dispatchers.IO) {
+                        barbershopViewModel.uploadImage(uri, context)
+                    }
                 }
             )
         }

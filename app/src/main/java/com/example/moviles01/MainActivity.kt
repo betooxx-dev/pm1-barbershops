@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import com.example.moviles01.model.data.Barbershop
 import com.example.moviles01.model.network.ApiService
@@ -26,6 +27,8 @@ import com.example.moviles01.viewmodel.barbershop.BarbershopViewModelFactory
 import com.example.moviles01.viewmodel.shared.SharedViewModel
 import com.example.moviles01.viewmodel.shared.SharedViewModelFactory
 import com.example.moviles01.viewmodel.shared.Screen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -175,6 +178,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             is Screen.BarbershopForm -> {
+                val context = LocalContext.current  // Agregamos esta línea
                 BarbershopForm(
                     barbershop = barbershopState.selectedBarbershop,
                     isLoading = barbershopState.isLoading,
@@ -189,6 +193,11 @@ class MainActivity : ComponentActivity() {
                     onCancel = {
                         barbershopViewModel.selectBarbershop(null)
                         sharedViewModel.navigateBack()
+                    },
+                    onUploadImage = { uri ->
+                        withContext(Dispatchers.IO) {
+                            barbershopViewModel.uploadImage(uri, context)
+                        }
                     }
                 )
             }

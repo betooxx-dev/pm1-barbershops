@@ -2,6 +2,7 @@ package com.example.moviles01.model.network
 
 import com.example.moviles01.model.data.Barbershop
 import com.example.moviles01.model.data.LoginResponse
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -26,4 +27,10 @@ interface ApiService {
 
     @DELETE("barbershop/{id}")
     suspend fun deleteBarbershop(@Path("id") id: String): Response<Unit>
+
+    @Multipart
+    @POST("barbershop/upload")
+    suspend fun uploadImage(
+        @Part file: MultipartBody.Part
+    ): Response<Map<String, String>>
 }
