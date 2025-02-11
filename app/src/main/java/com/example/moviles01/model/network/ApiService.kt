@@ -32,5 +32,5 @@ interface ApiService {
     @POST("barbershop/upload")
     suspend fun uploadImage(
         @Part file: MultipartBody.Part
-    ): Response<Map<String, String>>
+    ): Response<Map<String, String>>  // Ahora devuelve {"fileName": "nombre-archivo.jpg"}
 }

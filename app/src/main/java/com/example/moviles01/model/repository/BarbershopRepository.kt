@@ -64,6 +64,7 @@ class BarbershopRepository(private val apiService: ApiService) {
         }
     }
 
+    // BarbershopRepository.kt
     suspend fun uploadImage(imageUri: Uri, context: Context): Result<String> {
         return try {
             // Obtenemos el nombre real del archivo
@@ -93,7 +94,8 @@ class BarbershopRepository(private val apiService: ApiService) {
 
             val response = apiService.uploadImage(filePart)
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!["secure_url"] ?: "")
+                // Modificar esta línea para usar el nuevo nombre de archivo
+                Result.success(response.body()!!["fileName"] ?: "")
             } else {
                 Result.failure(Exception("Error al subir la imagen"))
             }

@@ -1,12 +1,15 @@
 package com.example.moviles01.view.screens.barbershop
 
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -78,24 +81,59 @@ fun BarbershopForm(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                if (logo.isNotEmpty()) {
-                    AsyncImage(
-                        model = logo,
-                        contentDescription = "Logo preview",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(bottom = 8.dp)
-                    )
+                // Preview de la imagen
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(bottom = 8.dp)
+                ) {
+                    when {
+                        // Muestra la imagen seleccionada pero aún no subida
+                        selectedImageUri != null -> {
+                            AsyncImage(
+                                model = selectedImageUri,
+                                contentDescription = "Vista previa",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                        // Muestra la imagen existente
+                        logo.isNotEmpty() -> {
+                            AsyncImage(
+                                model = "http://10.0.2.2:3000/barbershop/image/$logo",
+                                contentDescription = "Logo actual",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                        // Muestra un placeholder cuando no hay imagen
+                        else -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Sin imagen",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
                 }
 
+                // Botón para seleccionar imagen
                 ImagePicker { uri ->
                     selectedImageUri = uri
                     scope.launch {
                         isImageUploading = true
                         onUploadImage(uri).fold(
-                            onSuccess = { url ->
-                                logo = url
+                            onSuccess = { fileName ->
+                                logo = fileName
+                                selectedImageUri = null  // Limpiamos el URI temporal
                                 isImageUploading = false
                             },
                             onFailure = { exception ->

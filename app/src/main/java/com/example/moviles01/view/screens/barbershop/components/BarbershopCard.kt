@@ -23,7 +23,7 @@ fun BarbershopCard(
             modifier = Modifier.padding(16.dp)
         ) {
             AsyncImage(
-                model = barbershop.logo,
+                model = "http://10.0.2.2:3000/barbershop/image/${barbershop.logo}",
                 contentDescription = "Logo de ${barbershop.name}",
                 modifier = Modifier
                     .fillMaxWidth()
