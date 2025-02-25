@@ -1,12 +1,20 @@
 package com.example.moviles01
 
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.moviles01.model.data.Barbershop
 import com.example.moviles01.model.network.ApiService
@@ -27,6 +35,7 @@ import com.example.moviles01.viewmodel.barbershop.BarbershopViewModelFactory
 import com.example.moviles01.viewmodel.shared.SharedViewModel
 import com.example.moviles01.viewmodel.shared.SharedViewModelFactory
 import com.example.moviles01.viewmodel.shared.Screen
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -42,10 +51,25 @@ class MainActivity : ComponentActivity() {
     private lateinit var barbershopViewModel: BarbershopViewModel
     private lateinit var sharedViewModel: SharedViewModel
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            setupFirebaseMessaging()
+        } else {
+            // nada
+        }
+    }
+
+
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupDependencies()
         setupViewModels()
+        setupFirebaseMessaging()
+        askNotificationPermission()
 
         setContent {
             Moviles01Theme {
@@ -95,6 +119,51 @@ class MainActivity : ComponentActivity() {
             this,
             SharedViewModelFactory(prefsManager)
         )[SharedViewModel::class.java]
+    }
+
+    private fun setupFirebaseMessaging() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                // Guardar el token
+                prefsManager.saveFcmToken(token)
+                // Imprimir en el log
+                Log.d("FCM_TOKEN_MAIN", "Token obtenido: $token")
+
+                // Mostrar el token en un Toast (versión corta para visualización)
+                val shortToken = if (token.length > 20) "${token.substring(0, 20)}..." else token
+                Toast.makeText(
+                    this,
+                    "Token FCM: $shortToken",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // También puedes mostrar un Toast más informativo
+                Handler(Looper.getMainLooper()).postDelayed({
+                    Toast.makeText(
+                        this,
+                        "Token generado correctamente. Revisa los logs para el token completo.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }, 3500) // Mostrar después de 3.5 segundos
+            } else {
+                // Si hay error, registrarlo y mostrar Toast de error
+                Log.e("FCM_TOKEN_ERROR", "Error al obtener token FCM", task.exception)
+                Toast.makeText(
+                    this,
+                    "Error al obtener token FCM: ${task.exception?.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun askNotificationPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     @Composable
@@ -178,7 +247,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             is Screen.BarbershopForm -> {
-                val context = LocalContext.current  // Agregamos esta línea
+                val context = LocalContext.current
                 BarbershopForm(
                     barbershop = barbershopState.selectedBarbershop,
                     isLoading = barbershopState.isLoading,

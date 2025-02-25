@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1072335894876",
+    "project_id": "common-project-sandbox",
+    "storage_bucket": "common-project-sandbox.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072335894876:android:18296579ac901fda856999",
+        "android_client_info": {
+          "package_name": "com.example.moviles01"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvsIe0JN_6avlS1NJCQUeCT4LkeWkoHIo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

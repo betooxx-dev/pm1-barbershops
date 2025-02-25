@@ -16,4 +16,12 @@ class SharedPreferencesManager(context: Context) {
     fun clearToken() {
         prefs.edit().remove("jwt_token").apply()
     }
+
+    fun saveFcmToken(token: String) {
+        prefs.edit().putString("fcm_token", token).apply()
+    }
+
+    fun getFcmToken(): String? {
+        return prefs.getString("fcm_token", null)
+    }
 }

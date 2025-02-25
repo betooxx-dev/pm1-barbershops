@@ -33,4 +33,7 @@ interface ApiService {
     suspend fun uploadImage(
         @Part file: MultipartBody.Part
     ): Response<Map<String, String>>  // Ahora devuelve {"fileName": "nombre-archivo.jpg"}
+
+    @POST("auth/fcm-token")
+    suspend fun updateFcmToken(@Body tokenData: Map<String, String>): Response<Unit>
 }

@@ -2,6 +2,7 @@ package com.example.moviles01.model.repository
 
 import com.example.moviles01.model.data.LoginResponse
 import com.example.moviles01.model.network.ApiService
+import com.google.firebase.messaging.FirebaseMessaging
 
 class AuthRepository(
     private val apiService: ApiService,
@@ -45,5 +46,24 @@ class AuthRepository(
 
     fun logout() {
         prefsManager.clearToken()
+    }
+
+    fun updateFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                prefsManager.saveFcmToken(token)
+
+                // Si el usuario está autenticado, envía el token al servidor
+                if (prefsManager.getToken() != null) {
+                    sendFcmTokenToServer(token)
+                }
+            }
+        }
+    }
+
+    private fun sendFcmTokenToServer(token: String) {
+        // Implementa la llamada API para enviar el token al servidor
+        // Esto se puede hacer en una corrutina
     }
 }
