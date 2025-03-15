@@ -159,7 +159,6 @@ fun RegisterScreen(
             Text("¿Ya tienes cuenta? Inicia sesión")
         }
 
-        // Mostrar error local si existe
         localError?.let { error ->
             Text(
                 text = error,
@@ -169,7 +168,6 @@ fun RegisterScreen(
         }
     }
 
-    // Mostrar error del ViewModel si existe
     if (authState.error != null) {
         ErrorDialog(
             errorMessage = authState.error!!,

@@ -10,13 +10,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.example.moviles01.model.data.Barbershop
 import com.example.moviles01.model.network.ApiService
 import com.example.moviles01.model.network.AuthInterceptor
 import com.example.moviles01.model.repository.AuthRepository
@@ -125,12 +123,9 @@ class MainActivity : ComponentActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
-                // Guardar el token
                 prefsManager.saveFcmToken(token)
-                // Imprimir en el log
                 Log.d("FCM_TOKEN_MAIN", "Token obtenido: $token")
 
-                // Mostrar el token en un Toast (versión corta para visualización)
                 val shortToken = if (token.length > 20) "${token.substring(0, 20)}..." else token
                 Toast.makeText(
                     this,
@@ -138,16 +133,14 @@ class MainActivity : ComponentActivity() {
                     Toast.LENGTH_LONG
                 ).show()
 
-                // También puedes mostrar un Toast más informativo
                 Handler(Looper.getMainLooper()).postDelayed({
                     Toast.makeText(
                         this,
                         "Token generado correctamente. Revisa los logs para el token completo.",
                         Toast.LENGTH_LONG
                     ).show()
-                }, 3500) // Mostrar después de 3.5 segundos
+                }, 3500)
             } else {
-                // Si hay error, registrarlo y mostrar Toast de error
                 Log.e("FCM_TOKEN_ERROR", "Error al obtener token FCM", task.exception)
                 Toast.makeText(
                     this,

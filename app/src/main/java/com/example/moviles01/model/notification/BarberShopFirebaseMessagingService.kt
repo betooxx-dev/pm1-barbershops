@@ -15,29 +15,23 @@ import com.google.firebase.messaging.RemoteMessage
 class BarberShopFirebaseMessagingService1 : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // Verificar si el mensaje contiene datos
         remoteMessage.data.isNotEmpty().let {
-            // Procesar los datos del mensaje
             handleNow(remoteMessage)
         }
 
-        // Verificar si el mensaje contiene una notificación
         remoteMessage.notification?.let {
             sendNotification(it.title, it.body)
         }
     }
 
     override fun onNewToken(token: String) {
-        // Si necesitas enviar el token al servidor, hazlo aquí
         sendRegistrationToServer(token)
     }
 
     private fun handleNow(remoteMessage: RemoteMessage) {
-        // Aquí puedes procesar los datos personalizados de la notificación
         val barbershopId = remoteMessage.data["barbershopId"]
         val actionType = remoteMessage.data["actionType"]
 
-        // Según el tipo de acción, puedes mostrar diferentes notificaciones
         when (actionType) {
             "new_appointment" -> sendNotification(
                 "Nueva Cita",
@@ -76,7 +70,6 @@ class BarberShopFirebaseMessagingService1 : FirebaseMessagingService() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Android O requiere un canal de notificación
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -90,7 +83,6 @@ class BarberShopFirebaseMessagingService1 : FirebaseMessagingService() {
     }
 
     private fun sendRegistrationToServer(token: String) {
-        // Implementa la lógica para enviar el token a tu servidor
         // Esto es importante para enviar notificaciones específicas a este dispositivo
     }
 }

@@ -54,7 +54,6 @@ class AuthRepository(
                 val token = task.result
                 prefsManager.saveFcmToken(token)
 
-                // Si el usuario está autenticado, envía el token al servidor
                 if (prefsManager.getToken() != null) {
                     sendFcmTokenToServer(token)
                 }
@@ -64,6 +63,5 @@ class AuthRepository(
 
     private fun sendFcmTokenToServer(token: String) {
         // Implementa la llamada API para enviar el token al servidor
-        // Esto se puede hacer en una corrutina
     }
 }

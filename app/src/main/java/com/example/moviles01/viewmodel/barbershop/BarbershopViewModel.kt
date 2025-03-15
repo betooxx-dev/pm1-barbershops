@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class BarbershopViewModel(
     private val repository: BarbershopRepository
@@ -140,13 +139,11 @@ class BarbershopViewModel(
         )
     }
 
-    fun uploadImage(uri: Uri, context: Context): Result<String> {
-        return runBlocking {
-            try {
-                repository.uploadImage(uri, context)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+    suspend fun uploadImage(uri: Uri, context: Context): Result<String> {
+        return try {
+            repository.uploadImage(uri, context)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

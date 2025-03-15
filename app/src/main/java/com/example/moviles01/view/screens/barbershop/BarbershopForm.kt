@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.moviles01.model.data.Barbershop
@@ -47,7 +46,6 @@ fun BarbershopForm(
     var errorMessage by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     if (isLoading || isImageUploading) {
         LoadingSpinner()
@@ -66,7 +64,6 @@ fun BarbershopForm(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Sección de imagen
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,7 +78,6 @@ fun BarbershopForm(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                // Preview de la imagen
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -89,7 +85,6 @@ fun BarbershopForm(
                         .padding(bottom = 8.dp)
                 ) {
                     when {
-                        // Muestra la imagen seleccionada pero aún no subida
                         selectedImageUri != null -> {
                             AsyncImage(
                                 model = selectedImageUri,
@@ -98,7 +93,6 @@ fun BarbershopForm(
                                 contentScale = ContentScale.Fit
                             )
                         }
-                        // Muestra la imagen existente
                         logo.isNotEmpty() -> {
                             AsyncImage(
                                 model = "http://10.0.2.2:3000/barbershop/image/$logo",
@@ -107,7 +101,6 @@ fun BarbershopForm(
                                 contentScale = ContentScale.Fit
                             )
                         }
-                        // Muestra un placeholder cuando no hay imagen
                         else -> {
                             Box(
                                 modifier = Modifier
@@ -125,7 +118,6 @@ fun BarbershopForm(
                     }
                 }
 
-                // Botón para seleccionar imagen
                 ImagePicker { uri ->
                     selectedImageUri = uri
                     scope.launch {
@@ -133,7 +125,7 @@ fun BarbershopForm(
                         onUploadImage(uri).fold(
                             onSuccess = { fileName ->
                                 logo = fileName
-                                selectedImageUri = null  // Limpiamos el URI temporal
+                                selectedImageUri = null
                                 isImageUploading = false
                             },
                             onFailure = { exception ->
@@ -147,7 +139,6 @@ fun BarbershopForm(
             }
         }
 
-        // Información básica
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -181,7 +172,6 @@ fun BarbershopForm(
             }
         }
 
-        // Ubicación
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -214,7 +204,6 @@ fun BarbershopForm(
             }
         }
 
-        // Contacto
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -247,7 +236,6 @@ fun BarbershopForm(
             }
         }
 
-        // Horario
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -280,7 +268,6 @@ fun BarbershopForm(
             }
         }
 
-        // Botones de acción
         Row(
             modifier = Modifier
                 .fillMaxWidth()
