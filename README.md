@@ -73,7 +73,7 @@ private val prefs = EncryptedSharedPreferences.create(
 Se utiliza LeakCanary para detectar y prevenir fugas de memoria durante el desarrollo.
 
 ```gradle
-debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+debugImplementation (libs.leakcanary.android)
 ```
 
 ## 📋 Permisos requeridos
