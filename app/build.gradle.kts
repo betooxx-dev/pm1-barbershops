@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation (libs.androidx.security.crypto)
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.logging.interceptor)
     implementation (libs.coil.compose)
